@@ -35,12 +35,14 @@ uvsrc = [
   'src/unix/sysinfo-memory.c',
 ]
 
-uvdefines = [ '-D_GNU_SOURCE', ]
+uvflags = [ '-Wno-unused-parameter' ]
 uvincdir = include_directories('include', 'src', 'src/unix')
 
 if cc.get_define('__ANDROID__') != ''
   uvsrc += [ 'src/unix/android-ifaddrs.c',
              'src/unix/pthread-fixes.c' ]
+else
+  uvflags += [ '-D_GNU_SOURCE', ]
 endif
 
 pthread = dependency('threads')
@@ -51,7 +53,7 @@ libuv_deps = [ cc.find_library('m', required: false),
 
 libuv = library('uv',
   uvsrc,
-  c_args: uvdefines,
+  c_args: uvflags,
   dependencies: libuv_deps,
   include_directories: uvincdir,
 )
@@ -204,6 +206,7 @@ testsrc = [
 ]
 
 uvtest = executable('uvtest', testsrc,
+                    c_args: uvflags,
                     dependencies: [libuv_dep, pthread, cc.find_library('util')])
 
 test('uvtest', uvtest)
