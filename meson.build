@@ -25,15 +25,22 @@ uvsrc = [
   'src/unix/thread.c',
   'src/unix/timer.c',
   'src/unix/tty.c',
-  'src/unix/udp.c',
-  'src/unix/linux-core.c',
-  'src/unix/linux-inotify.c',
-  'src/unix/linux-syscalls.c',
-  'src/unix/procfs-exepath.c',
-  'src/unix/proctitle.c',
-  'src/unix/sysinfo-loadavg.c',
-  'src/unix/sysinfo-memory.c',
+  'src/unix/udp.c'
 ]
+
+# Linux systems
+if cc.get_define('__linux__') != ''
+    uvsrc += [
+      'src/unix/linux-core.c',
+      'src/unix/linux-inotify.c',
+      'src/unix/linux-syscalls.c',
+      'src/unix/procfs-exepath.c',
+      'src/unix/proctitle.c',
+      'src/unix/sysinfo-loadavg.c',
+      'src/unix/sysinfo-memory.c',
+    ]
+endif
+
 
 uvdefines = [ '-D_GNU_SOURCE', ]
 add_project_arguments(
@@ -46,6 +53,22 @@ uvincdir = include_directories('include', 'src', 'src/unix')
 if cc.get_define('__ANDROID__') != ''
   uvsrc += [ 'src/unix/android-ifaddrs.c',
              'src/unix/pthread-fixes.c' ]
+endif
+
+# OSX systems
+if cc.get_define('__APPLE__') != ''
+    uvsrc += [
+      'src/unix/bsd-ifaddrs.c',
+      'src/unix/darwin.c',
+      'src/unix/darwin-proctitle.c',
+      'src/unix/fsevents.c',
+      'src/unix/kqueue.c',
+      'src/unix/proctitle.c'
+    ]
+    uvdefines += [
+      '-D_DARWIN_USE_64_BIT_INODE=1',
+      '-D_DARWIN_UNLIMITED_SELECT=1'
+    ]
 endif
 
 pthread = dependency('threads')
