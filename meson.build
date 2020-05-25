@@ -36,6 +36,11 @@ uvsrc = [
 ]
 
 uvdefines = [ '-D_GNU_SOURCE', ]
+add_project_arguments(
+  # https://github.com/libuv/libuv/issues/2603
+  cc.get_supported_arguments('-fcommon'),
+  language: 'c',
+)
 uvincdir = include_directories('include', 'src', 'src/unix')
 
 if cc.get_define('__ANDROID__') != ''
@@ -206,4 +211,4 @@ testsrc = [
 uvtest = executable('uvtest', testsrc,
                     dependencies: [libuv_dep, pthread, cc.find_library('util')])
 
-test('uvtest', uvtest)
+test('uvtest', uvtest, timeout: 300)
